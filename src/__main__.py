@@ -1,19 +1,24 @@
-from mapsobserver import MapsObserver
-from trayIcon import showIcon, addMenuOption
-from sound import playAlert, setVolume, setAlertSoundPath
+import asyncio
+import webbrowser
+
 from config import getConfigs, writeConfig
 from dialogs import selectFileDialog, selectDirectoryDialog
+from mapsfileobserver import MapsFileObserver
+from mapsobserver import MapsObserver
+from sound import playAlert, setVolume, setAlertSoundPath
+from trayIcon import TrayIcon
 
-_iconPath = 'resources/icon.ico'
+loop = asyncio.get_event_loop()
 
 poeDirectoryPath, mapsFilePath, alertSoundPath, alertSoundVolume = getConfigs()
 
 setAlertSoundPath(alertSoundPath)
 setVolume(alertSoundVolume)
-
 mapsObserver = MapsObserver(poeDirectoryPath)
+
 mapsObserver.readMaps(mapsFilePath)
-mapsObserver.start()
+mapsFileObserver = MapsFileObserver(mapsFilePath)
+mapsFileObserver.onFileChanged = lambda: mapsObserver.readMaps(mapsFilePath)
 
 
 def selectPathOfExileDirectory(sysTray=None):
@@ -23,11 +28,8 @@ def selectPathOfExileDirectory(sysTray=None):
     writeConfig('Main', 'PathOfExileDirectoryPath', path)
 
 
-def selectMapsFile(sysTray=None):
-    path = selectFileDialog('Maps')
-    if not path:
-        return
-    writeConfig('Main', 'MapsFilePath', path)
+def openMapsFile(sysTray=None):
+    webbrowser.open(mapsFilePath)
 
 
 def selectAlertSound(sysTray=None):
@@ -37,14 +39,16 @@ def selectAlertSound(sysTray=None):
     writeConfig('Audio', 'AlertSoundPath', path)
 
 
-def onQuit(sysTray):
-    mapsObserver.stop()
-    exit()
+trayIcon = TrayIcon(lambda sysTray: loop.stop())
+trayIcon.addMenuOption('Select Alert Sound', selectAlertSound)
+trayIcon.addMenuOption('Play Alert', playAlert)
+trayIcon.addMenuOption('Open Maps File', openMapsFile)
+trayIcon.addMenuOption('Select Path of Exile folder', selectPathOfExileDirectory)
+trayIcon.showIcon()
 
-
-addMenuOption('Select alert sound', selectAlertSound)
-addMenuOption('Play Alert', playAlert)
-addMenuOption('Select maps file', selectMapsFile)
-addMenuOption('Reload Maps', lambda: mapsObserver.readMaps(mapsFilePath))
-addMenuOption('Select Path of Exile folder', selectPathOfExileDirectory)
-showIcon(_iconPath, onQuit)
+try:
+    asyncio.ensure_future(mapsObserver.observerCoroutine())
+    asyncio.ensure_future(mapsFileObserver.observerCoroutine())
+    loop.run_forever()
+finally:
+    loop.close()

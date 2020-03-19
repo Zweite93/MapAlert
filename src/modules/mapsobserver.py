@@ -1,8 +1,7 @@
+import asyncio
 import re
-import threading
-import time
-
 import unicodedata
+
 from sound import playAlert
 
 
@@ -15,22 +14,14 @@ class MapsObserver:
     def __init__(self, poeFolderPath):
         self._poeFolderPath = poeFolderPath
 
-    def start(self):
-        self.working = True
-        t = threading.Thread(target=self._doWork, args=())
-        t.start()
-
-    def stop(self):
-        self.working = False
-
-    def _doWork(self):
+    async def observerCoroutine(self):
         with open(self._poeFolderPath + '\\logs\\Client.txt', 'r', encoding="utf-8") as logsFile:
             logsFile.seek(0, 2)
             while self.working:
                 where = logsFile.tell()
                 line = logsFile.readline()
                 if not line:
-                    time.sleep(1)
+                    await asyncio.sleep(1)
                     logsFile.seek(where)
                 else:
                     match = re.search('(?<=You have entered )(.*)(?=.)', line)
@@ -38,6 +29,7 @@ class MapsObserver:
                         enteredMap = match.group(0)
                         if enteredMap in self._maps:
                             playAlert()
+                    await asyncio.sleep(1)
 
     def readMaps(self, path, sysTray=None):
         self._maps.clear()

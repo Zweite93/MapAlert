@@ -1,16 +1,22 @@
 from infi.systray import SysTrayIcon
 
-_tryIcon = None
-menuOptions = []
+_iconPath = 'resources/icon.ico'
 
 
-def showIcon(iconPath, onQuit):     # this will block thread until icon is stopped
-    global _tryIcon
-    _tryIcon = SysTrayIcon(iconPath, 'Map Alert', tuple(menuOptions), on_quit=onQuit)
-    _tryIcon.start()
+class TrayIcon:
+    _trayIcon = None
+    _menuOptions = []
 
+    def __init__(self, onQuit):
+        self._onQuit = onQuit
 
-def addMenuOption(name, func):
-    if _tryIcon:
-        raise NotImplemented()
-    menuOptions.append((name, None, func))
+    def showIcon(self):
+        if self._trayIcon:
+            self._trayIcon.shutdown()
+        self._trayIcon = SysTrayIcon(_iconPath, 'Map Alert', tuple(self._menuOptions), on_quit=self._onQuit)
+        self._trayIcon.start()
+
+    def addMenuOption(self, name, func):
+        self._menuOptions.append((name, None, func))
+        if self._trayIcon:
+            self.showIcon()

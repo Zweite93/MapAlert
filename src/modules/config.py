@@ -1,7 +1,8 @@
-import os
 import configparser
-from dialogs import selectFileDialog, selectDirectoryDialog
+import os
 from tkinter import messagebox
+
+from dialogs import selectFileDialog, selectDirectoryDialog
 
 _configPath = 'config.ini'
 
