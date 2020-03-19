@@ -3,13 +3,12 @@ import re
 import unicodedata
 
 from sound import playAlert
+from path import mapsFilePath
 
 
 class MapsObserver:
     _SYMBOLS = ["#", "@", "%", "&"]
     _maps = []
-
-    working = False
 
     def __init__(self, poeFolderPath):
         self._poeFolderPath = poeFolderPath
@@ -17,11 +16,11 @@ class MapsObserver:
     async def observerCoroutine(self):
         with open(self._poeFolderPath + '\\logs\\Client.txt', 'r', encoding="utf-8") as logsFile:
             logsFile.seek(0, 2)
-            while self.working:
+            while True:
                 where = logsFile.tell()
                 line = logsFile.readline()
                 if not line:
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.1)
                     logsFile.seek(where)
                 else:
                     match = re.search('(?<=You have entered )(.*)(?=.)', line)
@@ -29,11 +28,11 @@ class MapsObserver:
                         enteredMap = match.group(0)
                         if enteredMap in self._maps:
                             playAlert()
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.1)
 
-    def readMaps(self, path, sysTray=None):
+    def readMaps(self, sysTray=None):
         self._maps.clear()
-        with open(path, 'r', encoding="utf-8") as mapsFile:
+        with open(mapsFilePath, 'r', encoding="utf-8") as mapsFile:
             for line in mapsFile:
                 mapName = self._remove_control_characters(line)
                 if not mapName or mapName.startswith('#'):

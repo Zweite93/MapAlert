@@ -2,30 +2,26 @@ import configparser
 import os
 from tkinter import messagebox
 
-from dialogs import selectFileDialog, selectDirectoryDialog
-
-_configPath = 'config.ini'
+from dialogs import selectDirectoryDialog
+from path import defaultAlertSoundPath, configPath
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(configPath)
 
 
 def getConfigs():
     try:
         poeDirectoryPath = config['Main']['PathOfExileDirectoryPath']
-        mapsFilePath = config['Main']['MapsFilePath']
         alertSoundPath = config['Audio']['AlertSoundPath']
         alertSoundVolumeAsString = config['Audio']['Volume']
     except KeyError:
-        config['Main'] = {'PathOfExileDirectoryPath': '',
-                          'MapsFilePath': 'maps.txt'}
-        config['Audio'] = {'AlertSoundPath': 'resources/sound.mp3',
-                           'Volume': '0.3'}
-        with open(_configPath, 'w') as configFile:
+        config['Main'] = {'PathOfExileDirectoryPath': ''}
+        config['Audio'] = {'AlertSoundPath': defaultAlertSoundPath, 'Volume': '0.3'}
+        with open(configPath, 'w') as configFile:
             config.write(configFile)
         return getConfigs()
 
-    with open(_configPath, 'w') as configFile:
+    with open(configPath, 'w') as configFile:
         try:
             if not poeDirectoryPath or not os.path.exists(poeDirectoryPath):
                 poeDirectoryPath = selectDirectoryDialog('Path of Exile')
@@ -34,17 +30,8 @@ def getConfigs():
                     exit()
                 config['Main']['PathOfExileDirectoryPath'] = poeDirectoryPath
             if not alertSoundPath or not os.path.exists(alertSoundPath):
-                alertSoundPath = selectFileDialog('Alert Sound')
-                if not alertSoundPath:
-                    messagebox.showinfo('Map Alert', 'Alert sound file not selected, application closed.')
-                    exit()
+                alertSoundPath = defaultAlertSoundPath
                 config['Audio']['AlertSoundPath'] = alertSoundPath
-            if not mapsFilePath or not os.path.exists(mapsFilePath):
-                mapsFilePath = selectFileDialog('Maps')
-                if not mapsFilePath:
-                    messagebox.showinfo('Map Alert', 'Maps not to run file not selected, application closed.')
-                    exit()
-                config['Main']['MapsFilePath'] = mapsFilePath
             try:
                 alertSoundVolume = float(alertSoundVolumeAsString)
             except ValueError:
@@ -53,12 +40,10 @@ def getConfigs():
         finally:
             config.write(configFile)
 
-    return poeDirectoryPath, mapsFilePath, alertSoundPath, alertSoundVolume
+    return poeDirectoryPath, alertSoundPath, alertSoundVolume
 
 
 def writeConfig(category, key, value):
-    with open(_configPath, 'w') as configFile:
+    with open(configPath, 'w') as configFile:
         config[category][key] = value
         config.write(configFile)
-
-

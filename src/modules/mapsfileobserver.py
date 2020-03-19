@@ -1,10 +1,11 @@
 import asyncio
 import os
 
+from path import mapsFilePath
+
 
 class MapsFileObserver:
-    def __init__(self, mapsFilePath):
-        self._mapsFilePath = mapsFilePath
+    def __init__(self):
         self._working = False
         self._cachedStamp = 0
 
@@ -17,7 +18,7 @@ class MapsFileObserver:
 
     async def observerCoroutine(self):
         while True:
-            stamp = os.stat(self._mapsFilePath).st_mtime
+            stamp = os.stat(mapsFilePath).st_mtime
             if stamp != self._cachedStamp:
                 self._cachedStamp = stamp
                 self.onFileChanged()

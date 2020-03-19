@@ -1,6 +1,7 @@
 from infi.systray import SysTrayIcon
+from pathlib import Path
 
-_iconPath = 'resources/icon.ico'
+_iconPath = str(Path.cwd().joinpath('resources', 'icon.ico'))
 
 
 class TrayIcon:

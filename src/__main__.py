@@ -6,19 +6,21 @@ from dialogs import selectFileDialog, selectDirectoryDialog
 from mapsfileobserver import MapsFileObserver
 from mapsobserver import MapsObserver
 from sound import playAlert, setVolume, setAlertSoundPath
-from trayIcon import TrayIcon
+from trayicon import TrayIcon
+from path import mapsFilePath
 
 loop = asyncio.get_event_loop()
 
-poeDirectoryPath, mapsFilePath, alertSoundPath, alertSoundVolume = getConfigs()
+poeDirectoryPath, alertSoundPath, alertSoundVolume = getConfigs()
 
 setAlertSoundPath(alertSoundPath)
 setVolume(alertSoundVolume)
-mapsObserver = MapsObserver(poeDirectoryPath)
 
-mapsObserver.readMaps(mapsFilePath)
-mapsFileObserver = MapsFileObserver(mapsFilePath)
-mapsFileObserver.onFileChanged = lambda: mapsObserver.readMaps(mapsFilePath)
+mapsObserver = MapsObserver(poeDirectoryPath)
+mapsObserver.readMaps()
+
+mapsFileObserver = MapsFileObserver()
+mapsFileObserver.onFileChanged = lambda: mapsObserver.readMaps()
 
 
 def selectPathOfExileDirectory(sysTray=None):
