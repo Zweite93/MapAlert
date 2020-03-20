@@ -1,7 +1,4 @@
-import mimetypes
 from pathlib import Path
-
-mimetypes.init()
 
 _exeFiles = ['PathOfExileSteam.exe', 'PathOfExile_x64Steam.exe', 'PathOfExile.exe', 'PathOfExile_x64.exe']
 
