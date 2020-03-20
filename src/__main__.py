@@ -55,7 +55,7 @@ trayIcon.onSelectAlertSound = selectAlertSound
 trayIcon.onOpenMapsFile = openMapsFile
 trayIcon.onPlayAlert = playAlert
 trayIcon.onStopAlert = stopAlert
-trayIcon.onQuit = loop.stop
+trayIcon.onQuit = lambda: loop.call_soon_threadsafe(loop.stop)
 
 try:
     asyncio.ensure_future(mapsObserver.observerCoroutine())

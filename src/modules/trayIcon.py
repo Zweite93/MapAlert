@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import asyncio
 import PySimpleGUIQt as sg
 
 _iconPath = str(Path.cwd().joinpath('resources', 'icon.ico'))
@@ -24,12 +24,13 @@ class TrayIcon:
 
     async def showIcon(self):
         while True:
-            menu_item = self._trayIcon.read()
             try:
+                menu_item = self._trayIcon.read()
                 self._menuItemsMap[menu_item]()
-            except (KeyError, RuntimeError) as e:
+            except (KeyError, RuntimeError):
                 # TODO: add logger.
                 pass
+            await asyncio.sleep(0.1)
 
     def onSelectAlertSound(self):
         pass
