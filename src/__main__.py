@@ -2,19 +2,18 @@ import asyncio
 import webbrowser
 
 from config import getConfigs, writeConfig
-from dialogs import selectFileDialog, selectDirectoryDialog
+from dialogs import selectFileDialog, selectDirectoryDialog, showMessage
 from mapsfileobserver import MapsFileObserver
 from mapsobserver import MapsObserver
-from sound import playAlert, setVolume, setAlertSoundPath
+from path import mapsFilePath, poeDirectoryIsValid, audioFileIsValid
+from sound import playAlert, setAlertSoundPath
 from trayicon import TrayIcon
-from path import mapsFilePath
 
 loop = asyncio.get_event_loop()
 
-poeDirectoryPath, alertSoundPath, alertSoundVolume = getConfigs()
+poeDirectoryPath, alertSoundPath = getConfigs()
 
 setAlertSoundPath(alertSoundPath)
-setVolume(alertSoundVolume)
 
 mapsObserver = MapsObserver(poeDirectoryPath)
 mapsObserver.readMaps()
@@ -27,6 +26,10 @@ def selectPathOfExileDirectory(sysTray=None):
     path = selectDirectoryDialog('Path of Exile')
     if not path:
         return
+    if not poeDirectoryIsValid(path):
+        showMessage('Invalid directory. Are you sure this is Path of Exile directory?')
+        selectPathOfExileDirectory()
+        return
     writeConfig('Main', 'PathOfExileDirectoryPath', path)
 
 
@@ -38,6 +41,11 @@ def selectAlertSound(sysTray=None):
     path = selectFileDialog('Alert Sound')
     if not path:
         return
+    if not audioFileIsValid(path):
+        showMessage('Selected file is not audio file.')
+        selectAlertSound()
+        return
+    setAlertSoundPath(path)
     writeConfig('Audio', 'AlertSoundPath', path)
 
 

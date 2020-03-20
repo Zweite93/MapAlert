@@ -3,7 +3,7 @@ import re
 import unicodedata
 
 from sound import playAlert
-from path import mapsFilePath
+from path import mapsFilePath, getClientLogsPath
 
 
 class MapsObserver:
@@ -14,7 +14,7 @@ class MapsObserver:
         self._poeFolderPath = poeFolderPath
 
     async def observerCoroutine(self):
-        with open(self._poeFolderPath + '\\logs\\Client.txt', 'r', encoding="utf-8") as logsFile:
+        with open(getClientLogsPath(self._poeFolderPath), encoding="utf-8") as logsFile:
             logsFile.seek(0, 2)
             while True:
                 where = logsFile.tell()

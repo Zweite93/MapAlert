@@ -13,10 +13,9 @@ def getConfigs():
     try:
         poeDirectoryPath = config['Main']['PathOfExileDirectoryPath']
         alertSoundPath = config['Audio']['AlertSoundPath']
-        alertSoundVolumeAsString = config['Audio']['Volume']
     except KeyError:
         config['Main'] = {'PathOfExileDirectoryPath': ''}
-        config['Audio'] = {'AlertSoundPath': defaultAlertSoundPath, 'Volume': '0.3'}
+        config['Audio'] = {'AlertSoundPath': defaultAlertSoundPath}
         with open(configPath, 'w') as configFile:
             config.write(configFile)
         return getConfigs()
@@ -32,15 +31,10 @@ def getConfigs():
             if not alertSoundPath or not os.path.exists(alertSoundPath):
                 alertSoundPath = defaultAlertSoundPath
                 config['Audio']['AlertSoundPath'] = alertSoundPath
-            try:
-                alertSoundVolume = float(alertSoundVolumeAsString)
-            except ValueError:
-                alertSoundVolume = 1.0
-                config['Audio']['Volume'] = alertSoundVolume
         finally:
             config.write(configFile)
 
-    return poeDirectoryPath, alertSoundPath, alertSoundVolume
+    return poeDirectoryPath, alertSoundPath
 
 
 def writeConfig(category, key, value):

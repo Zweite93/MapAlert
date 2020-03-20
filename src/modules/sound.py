@@ -14,10 +14,6 @@ def playAlert(sysTray=None):
     mixer.music.play()
 
 
-def setVolume(volume):
-    mixer.music.set_volume(volume)
-
-
 def setAlertSoundPath(path):
     global alertSoundPath
     alertSoundPath = path

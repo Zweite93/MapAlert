@@ -1,28 +1,29 @@
 import os
 from tkinter import Tk, filedialog, messagebox
 
+root = Tk()
+root.withdraw()
+
 
 def selectDirectoryDialog(directoryName):
-    root = Tk()
-    root.withdraw()
     while True:
         path = filedialog.askdirectory(title='Please select a ' + directoryName + ' directory.')
         if not path:
             return None
-        if not os.path.exists(path):
-            messagebox.showinfo('Map Alert', 'Invalid directory.')
-            continue
-        return path
+        if os.path.exists(path):
+            return path
+        messagebox.showinfo('Map Alert', 'Invalid directory.')
 
 
 def selectFileDialog(fileName):
-    root = Tk()
-    root.withdraw()
     while True:
         path = filedialog.askopenfilename(title='Please select a ' + fileName + ' file.')
         if not path:
             return None
-        if not os.path.exists(path):
-            messagebox.showinfo('Atlas Alert', 'Invalid file.')
-            continue
-        return path
+        if os.path.exists(path):
+            return path
+        messagebox.showinfo('Map Alert', 'Invalid file.')
+
+
+def showMessage(message):
+    messagebox.showinfo('Map Alert', message)
