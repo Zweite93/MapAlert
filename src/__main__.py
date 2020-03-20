@@ -49,16 +49,17 @@ def selectAlertSound(sysTray=None):
     writeConfig('Audio', 'AlertSoundPath', path)
 
 
-trayIcon = TrayIcon(lambda sysTray: loop.stop())
+trayIcon = TrayIcon()
 trayIcon.addMenuOption('Select Alert Sound', selectAlertSound)
 trayIcon.addMenuOption('Play Alert', playAlert)
 trayIcon.addMenuOption('Open Maps File', openMapsFile)
 trayIcon.addMenuOption('Select Path of Exile folder', selectPathOfExileDirectory)
-trayIcon.showIcon()
+trayIcon.addMenuOption('Quit', lambda: loop.stop())
 
 try:
     asyncio.ensure_future(mapsObserver.observerCoroutine())
     asyncio.ensure_future(mapsFileObserver.observerCoroutine())
+    asyncio.ensure_future(trayIcon.showIcon())
     loop.run_forever()
 finally:
     loop.close()

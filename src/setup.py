@@ -51,4 +51,4 @@ setup(
                             shortcutDir='DesktopFolder', icon='resources/icon.ico',
                             targetName='MapAlert', base='Win32GUI')],
     options={'build_exe': build_exe_options, 'bdist_msi': bdist_msi_options},
-    install_requires=['Pillow', 'infi.systray'])
+    install_requires=['Pillow', 'PySimpleGUI'])

@@ -1,23 +1,28 @@
-from infi.systray import SysTrayIcon
+import asyncio
 from pathlib import Path
+
+import PySimpleGUIQt as sg
 
 _iconPath = str(Path.cwd().joinpath('resources', 'icon.ico'))
 
 
 class TrayIcon:
-    _trayIcon = None
-    _menuOptions = []
+    _menuItems = {}
+    _menu = []
 
-    def __init__(self, onQuit):
-        self._onQuit = onQuit
+    def __init__(self):
+        self._trayIcon = sg.SystemTray("Map Alert", filename=_iconPath)
+        self._menu.append('1')
+        self._menu.append([])
 
-    def showIcon(self):
-        if self._trayIcon:
-            self._trayIcon.shutdown()
-        self._trayIcon = SysTrayIcon(_iconPath, 'Map Alert', tuple(self._menuOptions), on_quit=self._onQuit)
-        self._trayIcon.start()
+    async def showIcon(self):
+        while True:
+            menu_item = self._trayIcon.read()
+            if menu_item in self._menuItems:
+                self._menuItems[menu_item]()
+            await asyncio.sleep(0.1)
 
     def addMenuOption(self, name, func):
-        self._menuOptions.append((name, None, func))
-        if self._trayIcon:
-            self.showIcon()
+        self._menuItems[name] = func
+        self._menu[1].append(name)
+        self._trayIcon.Update(menu=self._menu)
