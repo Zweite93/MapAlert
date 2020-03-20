@@ -28,7 +28,7 @@ def getConfigs():
                 while not poeDirectoryIsValid(poeDirectoryPath):
                     if not poeDirectoryPath:
                         messagebox.showinfo('Map Alert', 'Path of Exile directory not selected, application closed.')
-                        exit()
+                        return None
                     showMessage('Invalid directory. Are you sure this is Path of Exile directory?')
                     poeDirectoryPath = selectDirectoryDialog('Path of Exile')
                 config['Main']['PathOfExileDirectoryPath'] = poeDirectoryPath

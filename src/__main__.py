@@ -45,7 +45,11 @@ def _selectAlertSound():
 
 
 async def main():
-    poeDirectoryPath, alertSoundPath = getConfigs()
+    configs = getConfigs()
+    if not configs:
+        return
+
+    poeDirectoryPath, alertSoundPath = configs
     setAlertSoundPath(alertSoundPath)
 
     mapsObserver = MapsObserver(poeDirectoryPath)
