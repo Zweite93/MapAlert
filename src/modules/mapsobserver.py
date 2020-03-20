@@ -33,9 +33,6 @@ class MapsObserver:
                             await asyncio.sleep(0.1)
             except FileNotFoundError:
                 await asyncio.sleep(0.1)
-            except Exception as e:
-                # TODO: add logger.
-                raise
 
     def readMaps(self):
         self._maps.clear()

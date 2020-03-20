@@ -1,8 +1,10 @@
 import os
+from path import iconPath
 from tkinter import Tk, filedialog, messagebox
 
 root = Tk()
 root.withdraw()
+root.iconbitmap(iconPath)
 
 
 def selectDirectoryDialog(directoryName):
