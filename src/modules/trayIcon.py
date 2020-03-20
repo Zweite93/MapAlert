@@ -25,12 +25,12 @@ class TrayIcon:
     async def showIcon(self):
         while True:
             try:
-                menu_item = self._trayIcon.read()
+                menu_item = self._trayIcon.read(timeout=100)
                 self._menuItemsMap[menu_item]()
             except (KeyError, RuntimeError):
                 # TODO: add logger.
                 pass
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.01)
 
     def onSelectAlertSound(self):
         pass

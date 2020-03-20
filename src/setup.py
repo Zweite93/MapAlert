@@ -28,7 +28,8 @@ build_exe_options = {'path': sys.path + ['modules'],
                                        ('resources/sound.mp3', 'resources/sound.mp3'),
                                        ('resources/icon.ico', 'resources/icon.ico')],
                      'includes': ['modules/__init__', 'modules/config', 'modules/dialogs', 'modules/mapsfileobserver',
-                                  'modules/mapsobserver', 'modules/sound', 'modules/trayicon']}
+                                  'modules/mapsobserver', 'modules/sound', 'modules/trayicon'],
+                     'excludes': 'PySide2'}
 
 with open('../README.md', 'r') as fh:
     long_description = fh.read()

@@ -14,21 +14,28 @@ class MapsObserver:
         self._poeFolderPath = poeFolderPath
 
     async def observerCoroutine(self):
-        with open(getClientLogsPath(self._poeFolderPath), encoding="utf-8") as logsFile:
-            logsFile.seek(0, 2)
-            while True:
-                where = logsFile.tell()
-                line = logsFile.readline()
-                if not line:
-                    await asyncio.sleep(0.1)
-                    logsFile.seek(where)
-                else:
-                    match = re.search('(?<=You have entered )(.*)(?=.)', line)
-                    if match and not any(x in line for x in self._SYMBOLS):
-                        enteredMap = match.group(0)
-                        if enteredMap in self._maps:
-                            playAlert()
-                    await asyncio.sleep(0.1)
+        while True:
+            try:
+                with open(getClientLogsPath(self._poeFolderPath), encoding="utf-8") as logsFile:
+                    logsFile.seek(0, 2)
+                    while True:
+                        where = logsFile.tell()
+                        line = logsFile.readline()
+                        if not line:
+                            await asyncio.sleep(0.1)
+                            logsFile.seek(where)
+                        else:
+                            match = re.search('(?<=You have entered )(.*)(?=.)', line)
+                            if match and not any(x in line for x in self._SYMBOLS):
+                                enteredMap = match.group(0)
+                                if enteredMap in self._maps:
+                                    playAlert()
+                            await asyncio.sleep(0.1)
+            except FileNotFoundError:
+                await asyncio.sleep(0.1)
+            except Exception as e:
+                # TODO: add logger.
+                raise
 
     def readMaps(self):
         self._maps.clear()
