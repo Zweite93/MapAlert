@@ -1,36 +1,33 @@
-from pathlib import Path
 import asyncio
-import PySimpleGUIQt as sg
+import queue
 
-_iconPath = str(Path.cwd().joinpath('resources', 'icon.ico'))
+from infi.systray import SysTrayIcon
+
+from path import iconPath
 
 
 class TrayIcon:
-    _menu = []
-
     def __init__(self):
-        self._trayIcon = sg.SystemTray(['Map Alert',
-                                        ['Sound', ['Select Alert Sound', 'Play', 'Stop'],
-                                         'Open Maps File',
-                                         'Select Path of Exile folder',
-                                         'Quit']],
-                                       filename=_iconPath)
-        self._menuItemsMap = {'Select Alert Sound': lambda: self.onSelectAlertSound(),
-                              'Play': lambda: self.onPlayAlert(),
-                              'Stop': lambda: self.onStopAlert(),
-                              'Open Maps File': lambda: self.onOpenMapsFile(),
-                              'Select Path of Exile folder': lambda: self.onSelectPathOfExileDirectory(),
-                              'Quit': lambda: self.onQuit()}
+        menuOptions = (('Audio', None, (('Select Alert Sound', None, self._onSelectAlertSound),
+                                        ('Play', None, self._onPlayAlert),
+                                        ('Stop', None, self._onStopAlert))),
+                       ('Open Maps File', None, self._onOpenMapsFile),
+                       ('Select Path of Exile folder', None, self._onSelectPathOfExileDirectory))
+        self._icon = SysTrayIcon(iconPath, 'Map Alert', menu_options=menuOptions, on_quit=self._onQuit)
+        self._callbackQueue = queue.Queue()
 
     async def showIcon(self):
+        self._icon.start()
         while True:
             try:
-                menu_item = self._trayIcon.read(timeout=100)
-                self._menuItemsMap[menu_item]()
-            except (KeyError, RuntimeError):
-                # TODO: add logger.
-                pass
-            await asyncio.sleep(0.01)
+                callback = self._callbackQueue.get(False)
+                try:
+                    callback()
+                except Exception:
+                    # TODO : Add logger.
+                    raise
+            except queue.Empty:
+                await asyncio.sleep(0.1)
 
     def onSelectAlertSound(self):
         pass
@@ -49,3 +46,22 @@ class TrayIcon:
 
     def onQuit(self):
         pass
+
+    def _onSelectAlertSound(self, sysTray):
+        self._callbackQueue.put(self.onSelectAlertSound)
+
+    def _onPlayAlert(self, sysTray):
+        self._callbackQueue.put(self.onPlayAlert)
+
+    def _onStopAlert(self, sysTray):
+        self._callbackQueue.put(self.onStopAlert)
+
+    def _onOpenMapsFile(self, sysTray):
+        self._callbackQueue.put(self.onOpenMapsFile)
+
+    def _onSelectPathOfExileDirectory(self, sysTray):
+        self._callbackQueue.put(self.onSelectPathOfExileDirectory)
+
+    def _onQuit(self, sysTray):
+        self._callbackQueue.put(sysTray.shutdown)
+        self._callbackQueue.put(self.onQuit)
