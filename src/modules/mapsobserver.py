@@ -30,7 +30,7 @@ class MapsObserver:
                             playAlert()
                     await asyncio.sleep(0.1)
 
-    def readMaps(self, sysTray=None):
+    def readMaps(self):
         self._maps.clear()
         with open(mapsFilePath, 'r', encoding="utf-8") as mapsFile:
             for line in mapsFile:

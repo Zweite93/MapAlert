@@ -8,10 +8,14 @@ mixer.init()
 pygame.init()
 
 
-def playAlert(sysTray=None):
+def playAlert():
     global alertSoundPath
     mixer.music.load(alertSoundPath)
     mixer.music.play()
+
+
+def stopAlert():
+    mixer.music.stop()
 
 
 def setAlertSoundPath(path):

@@ -6,7 +6,7 @@ from dialogs import selectFileDialog, selectDirectoryDialog, showMessage
 from mapsfileobserver import MapsFileObserver
 from mapsobserver import MapsObserver
 from path import mapsFilePath, poeDirectoryIsValid, audioFileIsValid
-from sound import playAlert, setAlertSoundPath
+from sound import playAlert, setAlertSoundPath, stopAlert
 from trayicon import TrayIcon
 
 loop = asyncio.get_event_loop()
@@ -22,7 +22,7 @@ mapsFileObserver = MapsFileObserver()
 mapsFileObserver.onFileChanged = lambda: mapsObserver.readMaps()
 
 
-def selectPathOfExileDirectory(sysTray=None):
+def selectPathOfExileDirectory():
     path = selectDirectoryDialog('Path of Exile')
     if not path:
         return
@@ -33,11 +33,11 @@ def selectPathOfExileDirectory(sysTray=None):
     writeConfig('Main', 'PathOfExileDirectoryPath', path)
 
 
-def openMapsFile(sysTray=None):
+def openMapsFile():
     webbrowser.open(mapsFilePath)
 
 
-def selectAlertSound(sysTray=None):
+def selectAlertSound():
     path = selectFileDialog('Alert Sound')
     if not path:
         return
@@ -50,11 +50,12 @@ def selectAlertSound(sysTray=None):
 
 
 trayIcon = TrayIcon()
-trayIcon.addMenuOption('Select Alert Sound', selectAlertSound)
-trayIcon.addMenuOption('Play Alert', playAlert)
-trayIcon.addMenuOption('Open Maps File', openMapsFile)
-trayIcon.addMenuOption('Select Path of Exile folder', selectPathOfExileDirectory)
-trayIcon.addMenuOption('Quit', lambda: loop.stop())
+trayIcon.onSelectPathOfExileDirectory = selectPathOfExileDirectory
+trayIcon.onSelectAlertSound = selectAlertSound
+trayIcon.onOpenMapsFile = openMapsFile
+trayIcon.onPlayAlert = playAlert
+trayIcon.onStopAlert = stopAlert
+trayIcon.onQuit = loop.stop
 
 try:
     asyncio.ensure_future(mapsObserver.observerCoroutine())
