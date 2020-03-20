@@ -1,8 +1,8 @@
 import configparser
 from tkinter import messagebox
 
-from dialogs import selectDirectoryDialog
-from path import defaultAlertSoundPath, configPath
+from dialogs import selectDirectoryDialog, showMessage
+from path import defaultAlertSoundPath, configPath, poeDirectoryIsValid
 from pathlib import Path
 
 config = configparser.ConfigParser()
@@ -14,7 +14,7 @@ def getConfigs():
             config.read_file(configFile)
         poeDirectoryPath = config['Main']['PathOfExileDirectoryPath']
         alertSoundPath = config['Audio']['AlertSoundPath']
-    except KeyError:
+    except (KeyError, FileNotFoundError):
         config['Main'] = {'PathOfExileDirectoryPath': ''}
         config['Audio'] = {'AlertSoundPath': defaultAlertSoundPath}
         with open(configPath, 'w') as configFile:
@@ -25,9 +25,12 @@ def getConfigs():
         try:
             if not poeDirectoryPath or not Path(poeDirectoryPath).exists():
                 poeDirectoryPath = selectDirectoryDialog('Path of Exile')
-                if not poeDirectoryPath:
-                    messagebox.showinfo('Map Alert', 'Path of Exile directory not selected, application closed.')
-                    exit()
+                while not poeDirectoryIsValid(poeDirectoryPath):
+                    if not poeDirectoryPath:
+                        messagebox.showinfo('Map Alert', 'Path of Exile directory not selected, application closed.')
+                        exit()
+                    showMessage('Invalid directory. Are you sure this is Path of Exile directory?')
+                    poeDirectoryPath = selectDirectoryDialog('Path of Exile')
                 config['Main']['PathOfExileDirectoryPath'] = poeDirectoryPath
             if not alertSoundPath or not Path(alertSoundPath).exists():
                 alertSoundPath = defaultAlertSoundPath

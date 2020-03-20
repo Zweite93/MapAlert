@@ -9,6 +9,8 @@ iconPath = Path.cwd().joinpath('resources', 'icon.ico').as_posix()
 
 
 def poeDirectoryIsValid(path):
+    if not path:
+        return False
     return any(Path(path).joinpath(exe).exists() for exe in _exeFiles)
 
 
