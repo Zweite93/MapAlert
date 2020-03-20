@@ -21,3 +21,11 @@ def stopAlert():
 def setAlertSoundPath(path):
     global alertSoundPath
     alertSoundPath = path
+
+
+def audioFileIsValid(path):
+    try:
+        mixer.music.load(path)
+        return True
+    except pygame.error:
+        return False

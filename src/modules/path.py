@@ -15,10 +15,5 @@ def poeDirectoryIsValid(path):
     return any(Path(path).joinpath(exe).exists() for exe in _exeFiles)
 
 
-def audioFileIsValid(path):
-    fileType = mimetypes.guess_type(Path(path).suffix)[0]
-    return fileType is not None and fileType.split('/')[0] == 'audio'
-
-
 def getClientLogsPath(poeDirectoryPath):
     return Path(poeDirectoryPath).joinpath('logs', 'Client.txt').as_posix()

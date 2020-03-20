@@ -16,18 +16,17 @@ class TrayIcon:
         self._icon = SysTrayIcon(iconPath, 'Map Alert', menu_options=menuOptions, on_quit=self._onQuit)
         self._callbackQueue = queue.Queue()
 
-    async def showIcon(self):
+    async def show(self):
         self._icon.start()
         while True:
             try:
                 callback = self._callbackQueue.get(False)
-                try:
-                    callback()
-                except Exception:
-                    # TODO : Add logger.
-                    raise
+                callback()
             except queue.Empty:
                 await asyncio.sleep(0.1)
+
+    def close(self):
+        self._icon.shutdown()
 
     def onSelectAlertSound(self):
         pass
